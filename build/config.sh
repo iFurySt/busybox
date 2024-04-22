@@ -1,0 +1,4 @@
+DOCKER_REGISTRY=ghcr.io
+DOCKER_ORG=ifuryst
+DOCKER_IMAGE=busybox
+DOCKER_BASE_DIR="."
