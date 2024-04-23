@@ -11,8 +11,13 @@ import (
 	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
+	"sync/atomic"
 	"syscall"
 	"time"
+)
+
+var (
+	isExiting atomic.Bool
 )
 
 func NewCmdExit() *cobra.Command {
@@ -59,12 +64,20 @@ func handleSignal(durations map[os.Signal]time.Duration) {
 		for {
 			sig := <-sigs
 			duration := durations[sig]
-			fmt.Println()
-			fmt.Println("Signal received:", sig)
-			fmt.Println("Waiting for", duration.String(), "before exit")
-			time.Sleep(duration)
-			fmt.Println("Exiting now...")
-			os.Exit(0)
+			fmt.Println("-> Signal received:", sig)
+			tryExit(duration)
 		}
+	}()
+}
+
+func tryExit(duration time.Duration) {
+	go func() {
+		if !isExiting.CompareAndSwap(false, true) {
+			return
+		}
+		fmt.Println("Waiting for", duration.String(), "before exit")
+		countDown(int(duration.Seconds()))
+		fmt.Println("Exiting now...")
+		os.Exit(0)
 	}()
 }

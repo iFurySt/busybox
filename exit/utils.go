@@ -21,3 +21,10 @@ func mustParseDuration(duration string) time.Duration {
 	}
 	return d
 }
+
+func countDown(c int) {
+	for i := c; i > 0; i-- {
+		fmt.Println(i)
+		time.Sleep(time.Second)
+	}
+}
