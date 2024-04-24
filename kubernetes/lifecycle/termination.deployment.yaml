@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-deployment
+  labels:
+    app: busybox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: busybox
+  template:
+    metadata:
+      labels:
+        app: busybox
+    spec:
+      terminationGracePeriodSeconds: 20
+      containers:
+        - name: busybox
+          image: ghcr.io/ifuryst/busybox:main
+          command: ["/app/busybox"]
+          args: ["exit", "--sigint-duration", "5s", "--sigterm-duration", "10s"]
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 5"]
